@@ -35,6 +35,16 @@
 <script src="~/Scripts/jquery.signalR-2.2.2.min.js"></script>
 <script src='/signalr/js'></script>
  <script type="text/javascript">
+
+     //Not white
+     function generateRandomColorString() {
+         // Let's use black by setting RGB values to 0, and 255 alpha (completely opaque)
+         r = Math.random() * 200 + 20; g = Math.random() * 200 + 20; b = Math.random() * 200 + 20; a = 255;
+         return "rgba(" + r + "," + g + "," + b + "," + (a / 255) + ")";
+     }
+
+     var colorString = generateRandomColorString();
+
     //Create the SignalR Connection
     var DOT = $.connection.drawDot;
 
@@ -42,14 +52,21 @@
     $.connection.hub.start().done();
 
     //Function called from DrawDot Server
-    DOT.client.updateDot = function (x, y) {
-            drawDot(x, y, 8);
+    DOT.client.updateDot = function (x, y, colorString) {
+            drawDot(x, y, 8, colorString);
         };
 
     //Function called from DrawDot Server
     DOT.client.clearCanvas = function (x, y) {
             clearCanvas();
         };
+
+     //Not white
+     function generateRandomColorString() {
+         // Let's use black by setting RGB values to 0, and 255 alpha (completely opaque)
+         r = Math.floor(Math.random() * 200 + 20); g = Math.floor(Math.random() * 200 + 20); b = Math.floor(Math.random() * 200 + 20); a = 255;
+         return "rgba(" + r + "," + g + "," + b + "," + (a / 255) + ")";
+     }
 
     //////////////////////////////////////////////////////
     // Variables for referencing the canvas and 2dcanvas context
@@ -58,11 +75,9 @@
     var mouseX, mouseY, mouseDown = 0;
     // Draws a dot at a specific position on the supplied canvas name
     // Parameters are: A canvas context, the x position, the y position, the size of the dot
-    function drawDot(x, y, size) {
-            // Let's use black by setting RGB values to 0, and 255 alpha (completely opaque)
-            r = 0; g = 0; b = 0; a = 255;
+    function drawDot(x, y, size, colorString) {
         // Select a fill style
-        ctx.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (a / 255) + ")";
+        ctx.fillStyle = colorString
         // Draw a filled circle
         ctx.beginPath();
         ctx.arc(x, y, size, 0, Math.PI * 2, true);
@@ -84,7 +99,7 @@
     function sketchpad_mouseDown() {
             mouseDown = 1;
         drawDot(mouseX, mouseY, 8);
-        DOT.server.updateCanvas(mouseX, mouseY);
+        DOT.server.updateCanvas(mouseX, mouseY, colorString);
     }
 
     // Keep track of the mouse button being released
@@ -98,8 +113,8 @@
             getMousePos(e);
         // Draw a dot if the mouse button is currently being pressed
         if (mouseDown == 1) {
-            drawDot(mouseX, mouseY, 8);
-        DOT.server.updateCanvas(mouseX, mouseY);
+            drawDot(mouseX, mouseY, 8, colorString);
+        DOT.server.updateCanvas(mouseX, mouseY, colorString);
         }
     }
 
@@ -129,8 +144,9 @@
         if (ctx) {
             // React to mouse events on the canvas, and mouseup on the entire document
             canvas.addEventListener('mousedown', sketchpad_mouseDown, false);
-        canvas.addEventListener('mousemove', sketchpad_mouseMove, false);
+            canvas.addEventListener('mousemove', sketchpad_mouseMove, false);
             window.addEventListener('mouseup', sketchpad_mouseUp, false);
+
         }
         else {
             document.write("Browser not supported!!");

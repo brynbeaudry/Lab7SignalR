@@ -8,9 +8,9 @@ namespace Lab7SignalR
 {
     public class DrawDot : Hub
     {
-        public void UpdateCanvas(int x, int y)
+        public void UpdateCanvas(int x, int y, string colorString)
         {
-            Clients.All.updateDot(x, y);
+            Clients.All.updateDot(x, y, colorString);
         }
 
         public void ClearCanvas()
